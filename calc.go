@@ -28,7 +28,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -89,8 +91,15 @@ func solutionOfExpression(expression string) string {
 	// fmt.Println(expression)
 	isLegitimate(expression)
 	preparedExpression := getAdoptedExpression(expression)
+	// fmt.Println("Prep:", preparedExpression)
 	reversedPolishNotation := expression2ReversedPolishNotation(preparedExpression)
 	arabicNumber := reversedPolishNotation2Answer(reversedPolishNotation)
+	// fmt.Println("Arab:",arabicNumber)
+	if arabicNumber < 0 {
+		cutminus := strconv.FormatInt(arabicNumber, 10)
+		ans, _ := strconv.ParseInt(cutminus[1:], 10, 64)
+		return "-" + arabicToRoman(ans)
+	}
 	return arabicToRoman(arabicNumber)
 }
 
@@ -105,7 +114,14 @@ func isLegitimate(expression string) {
 		fmt.Println("error: expressions contains illegal symbol or operand")
 		panic("error: expressions contains illegal symbol or operand")
 	}
-	// TODO: Add check expressions like (I+II)* idk 4 now
+	// Check expressions like (I+II)*
+	if 	expression[0] == '*'|| expression[len(expression)-1] == '*' ||
+		expression[len(expression)-1] == '-' || // ха-ха  expression[0] == '-'
+		expression[0] == '+'|| expression[len(expression)-1] == '+' ||
+		expression[0] == '/'|| expression[len(expression)-1] == '/' {
+		fmt.Println("error: beginning/ending of expression contains illegal symbol")
+		panic("error: beginning/ending of expression contains illegal symbol")
+	}
 }
 
 func containsUnallowedSymbol(expression string) bool {
@@ -137,9 +153,9 @@ func getAdoptedExpression(expression string) string {
 		var symbol = rune(expression[token])
 		if symbol == '-' {
 			if token == 0 { // Чекаем первый символ, явл ли он -
-				adoptedExpression += "0"
+				adoptedExpression += "Z"
 			} else if expression[token-1] == '(' {
-				adoptedExpression += "0"
+				adoptedExpression += "Z"
 			}
 		}
 		adoptedExpression += string(symbol)
@@ -215,8 +231,6 @@ func reversedPolishNotation2Answer(rpn string) int64 {
 		if getPriorityOfOperation(rune(rpn[i])) == 0 {
 			// fmt.Println("Число")
 			// Собираем все число
-			// ~~~~~~~~~~
-			// тут Баг
 			for ; rpn[i] != ' ' && getPriorityOfOperation(rune(rpn[i])) == 0; {
 				operand += string(rpn[i])
 				i++
@@ -250,7 +264,9 @@ func reversedPolishNotation2Answer(rpn string) int64 {
 					fmt.Println("error: division by zero!")
 					panic("error: division by zero!")
 				} else {
-					stack.Push(b / a)
+					ans:= math.Floor(float64(b) /float64(a))
+					// fmt.Println(math.Floor(float64(b) /float64(a)), "=" ,ans)
+					stack.Push(int64(ans))
 				}
 			}
 		}
