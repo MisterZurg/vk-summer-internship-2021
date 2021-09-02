@@ -50,3 +50,6 @@ Go: ```go build -o calc```
 ## Бонусом будет:
 * Описание BNF-грамматики в файле grammar.txt.
 * Ответ ошибкой при определении целочисленного переполнения.
+
+
+### [Разбор тестового задания команды Core Infrastructure](https://vk.com/@vkteam-razbor-testovogo-zadaniya-komandy-core-infrastructure)
